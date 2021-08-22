@@ -40,12 +40,13 @@ historico = modelo.fit(imagens_treino, identificacoes_treino, epochs=5, validati
 modelo.save('modelo.h5')
 modelo_salvo = load_model('modelo.h5')
 
-plt.plot(historico.history['acc'])
-plt.plot(historico.history['val_acc'])
-plt.title('Acurácia por épocas')
-plt.xlabel('épocas')
-plt.ylabel('acurácia')
-plt.legend(['treino', 'validação'])
+#--- Use it just in Google Notebook
+#plt.plot(historico.history['acc'])
+#plt.plot(historico.history['val_acc'])
+#plt.title('Acurácia por épocas')
+#plt.xlabel('épocas')
+#plt.ylabel('acurácia')
+#plt.legend(['treino', 'validação'])
 
 plt.plot(historico.history['loss'])
 plt.plot(historico.history['val_loss'])
