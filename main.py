@@ -54,6 +54,7 @@ plt.title('Perda por épocas')
 plt.xlabel('épocas')
 plt.ylabel('perda')
 plt.legend(['treino', 'validação'])
+plt.show()
 
 testes = modelo.predict(imagens_teste)
 print('resultado teste:', np.argmax(testes[1]))
