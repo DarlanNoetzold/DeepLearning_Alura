@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from tensorflow.keras.models import load_model
 
+# Pegando o dataset
 dataset = keras.datasets.fashion_mnist
 ((imagens_treino, identificacoes_treino), (imagens_teste, identificacoes_teste)) = dataset.load_data()
 
@@ -22,8 +23,10 @@ nomes_de_classificacoes = ['Camiseta', 'Calça', 'Pullover',
 plt.imshow(imagens_treino[0])
 plt.colorbar()
 
+# Normalização das imagens
 imagens_treino = imagens_treino/float(255)
 
+#Criando o Modelo e normalizando
 modelo = keras.Sequential([
     keras.layers.Flatten(input_shape=(28, 28)),
     keras.layers.Dense(256, activation=tensorflow.nn.relu),
@@ -31,16 +34,19 @@ modelo = keras.Sequential([
     keras.layers.Dense(10, activation=tensorflow.nn.softmax)
 ])
 
+#Compilando o modelo
 modelo.compile(optimizer='adam',
                loss='sparse_categorical_crossentropy',
                metrics=['accuracy'])
 
+#Treinando o modelo
 historico = modelo.fit(imagens_treino, identificacoes_treino, epochs=5, validation_split=0.2)
 
 modelo.save('modelo.h5')
 modelo_salvo = load_model('modelo.h5')
 
 #--- Use it just in Google Notebook
+# Visualização da acurácia
 #plt.plot(historico.history['acc'])
 #plt.plot(historico.history['val_acc'])
 #plt.title('Acurácia por épocas')
