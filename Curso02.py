@@ -45,6 +45,8 @@ print(pesos_camada_dense)
 modelo.save('modelo.h5')
 modelo_salvo = load_model('modelo.h5')
 
+modelo.get_config()
+
 plt.plot(historico.history['acc'])
 plt.plot(historico.history['val_acc'])
 plt.title('Acurácia por épocas')
