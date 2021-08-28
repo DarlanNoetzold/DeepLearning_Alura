@@ -72,3 +72,5 @@ print('número da imagem de teste:', identificacoes_teste[1])
 perda_teste, acuracia_teste = modelo.evaluate(imagens_teste, identificacoes_teste)
 print('Perda do teste:', perda_teste)
 print('Acurácia do teste:', acuracia_teste)
+
+#Gradiente Descendente, Minimo local, minimo global e pontos aleatórios de inicio para desviar dos minimos locais (gradiente descendente estocástico)
