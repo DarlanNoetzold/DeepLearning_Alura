@@ -119,3 +119,96 @@ sns.lineplot(x=xtreino,y=ytreino,label='treino')
 sns.lineplot(x=xteste,y=yteste,label='teste')
 sns.lineplot(x=xtreino,y=y_predict[:,0],label='ajuste_treino')
 sns.lineplot(x=xteste,y=y_predict_teste[:,0],label='previsão')
+
+# Aula 3
+
+## Alterando a forma como passamos os dados
+
+#Agora x e y vão valores diferentes. X vai conter o número de passageiros em um tempo anterior e y vai conter o número de passageiros em t+1, por exemplo.
+
+vetor = pd.DataFrame(ytreino)[0]
+
+import numpy as np
+
+def separa_dados(vetor,n_passos):
+  """Entrada: vetor: número de passageiros
+               n_passos: número de passos no regressor
+     Saída:
+              X_novo: Array 2D
+              y_novo: Array 1D - Nosso alvo
+  """
+  X_novo, y_novo = [], []
+  for i in range(n_passos,vetor.shape[0]):
+    X_novo.append(list(vetor.loc[i-n_passos:i-1]))
+    y_novo.append(vetor.loc[i])
+  X_novo, y_novo = np.array(X_novo), np.array(y_novo)
+  return X_novo, y_novo
+
+xtreino_novo, ytreino_novo = separa_dados(vetor,1)
+
+print(xtreino_novo[0:5]) #X
+
+print(ytreino_novo[0:5]) #y
+
+## Agora vamos separar o teste
+
+vetor2 = pd.DataFrame(yteste)[0]
+
+xteste_novo, yteste_novo = separa_dados(vetor2,1)
+
+## Voltando para as redes neurais
+
+regressor3 = Sequential()
+
+regressor3.add(Dense(8, input_dim=1, kernel_initializer='ones', activation='linear',use_bias=False))
+regressor3.add(Dense(64, kernel_initializer='random_uniform', activation='sigmoid',use_bias=False))
+regressor3.add(Dense(1, kernel_initializer='random_uniform', activation='linear',use_bias=False))
+regressor3.compile(loss='mean_squared_error',optimizer='adam')
+regressor3.summary()
+
+regressor3.fit(xtreino_novo,ytreino_novo,epochs =100)
+
+y_predict_novo = regressor3.predict(xtreino_novo)
+
+sns.lineplot(x='tempo',y=ytreino_novo,data=passageiros[1:129],label='treino')
+sns.lineplot(x='tempo',y=pd.DataFrame(y_predict_novo)[0],data=passageiros[1:129],label='ajuste_treino')
+
+y_predict_teste_novo = regressor3.predict(xteste_novo)
+
+resultado = pd.DataFrame(y_predict_teste_novo)[0]
+
+sns.lineplot(x='tempo',y=ytreino_novo,data=passageiros[1:129],label='treino')
+sns.lineplot(x='tempo',y=pd.DataFrame(y_predict_novo)[0],data=passageiros[1:129],label='ajuste_treino')
+
+sns.lineplot(x='tempo',y=yteste_novo,data=passageiros[130:144],label='teste')
+sns.lineplot(x='tempo',y=resultado.values,data=passageiros[130:144],label='previsão')
+
+## Janelas
+
+xtreino_novo, ytreino_novo = separa_dados(vetor,4)
+
+xtreino_novo[0:5] #X
+
+ytreino_novo[0:5] #y
+
+xteste_novo, yteste_novo = separa_dados(vetor2,4)
+
+regressor4 = Sequential()
+
+regressor4.add(Dense(8, input_dim=4, kernel_initializer='random_uniform', activation='linear',use_bias=False)) #relu
+regressor4.add(Dense(64, kernel_initializer='random_uniform', activation='sigmoid',use_bias=False)) #relu
+regressor4.add(Dense(1, kernel_initializer='random_uniform', activation='linear',use_bias=False))
+regressor4.compile(loss='mean_squared_error',optimizer='adam')
+regressor4.summary()
+
+regressor4.fit(xtreino_novo,ytreino_novo,epochs =300)
+
+y_predict_teste_novo = regressor4.predict(xteste_novo)
+
+resultado = pd.DataFrame(y_predict_teste_novo)[0]
+
+sns.lineplot(x='tempo',y=ytreino_novo,data=passageiros[4:129],label='treino')
+sns.lineplot(x='tempo',y=pd.DataFrame(y_predict_novo)[0],data=passageiros[4:129],label='ajuste_treino')
+
+sns.lineplot(x='tempo',y=yteste_novo,data=passageiros[133:144],label='teste')
+sns.lineplot(x='tempo',y=resultado.values,data=passageiros[133:144],label='previsão')
