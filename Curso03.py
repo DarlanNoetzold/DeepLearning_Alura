@@ -213,3 +213,83 @@ sns.lineplot(x='tempo',y=pd.DataFrame(y_predict_novo)[0],data=passageiros[4:129]
 sns.lineplot(x='tempo',y=yteste_novo,data=passageiros[133:144],label='teste')
 sns.lineplot(x='tempo',y=resultado.values,data=passageiros[133:144],label='previsão')
 
+#Nova base de dados
+
+bike = pd.read_csv('bicicletas.csv')
+
+bike.head()
+
+bike['datas'] = pd.to_datetime(bike['datas'])
+
+sns.lineplot(x='datas',y='contagem', data=bike)
+plt.xticks(rotation=70)
+
+## Escalando os dados
+
+sc2 = StandardScaler()
+
+sc2.fit(bike['contagem'].values.reshape(-1,1))
+
+y = sc2.transform(bike['contagem'].values.reshape(-1,1))
+
+## Dividindo em treino e teste
+
+tamanho_treino = int(len(bike)*0.9) #Pegando 90% dos dados para treino
+tamanho_teste = len(bike)-tamanho_treino #O resto vamos reservar para teste
+
+ytreino = y[0:tamanho_treino]
+yteste = y[tamanho_treino:len(bike)]
+
+sns.lineplot(x='datas',y=ytreino[:,0],data=bike[0:tamanho_treino],label='treino')
+sns.lineplot(x='datas',y=yteste[:,0], data=bike[tamanho_treino:len(bike)],label='teste')
+plt.xticks(rotation=70)
+
+vetor = pd.DataFrame(ytreino)[0]
+
+xtreino_novo, ytreino_novo = separa_dados(vetor,10)
+
+print(xtreino_novo[0:5])
+
+print(ytreino_novo[0:5])
+
+vetor2 = pd.DataFrame(yteste)[0]
+
+xteste_novo, yteste_novo = separa_dados(vetor2,10)
+
+## O que a LSTM espera
+
+# A entrada de redes recorrentes deve possuir a seguinte forma para a entrada (número de amostras, número de passos no tempo,
+# e número de atributos por passo no tempo).
+
+xtreino_novo = xtreino_novo.reshape((xtreino_novo.shape[0],xtreino_novo.shape[1],1))
+
+print(xtreino_novo.shape)
+
+xteste_novo = xteste_novo.reshape((xteste_novo.shape[0],xteste_novo.shape[1],1))
+
+## Usando a LSTM
+
+from tensorflow.keras.layers import LSTM
+
+recorrente = Sequential()
+
+recorrente.add(LSTM(128, input_shape=(xtreino_novo.shape[1],xtreino_novo.shape[2])
+                    ))
+recorrente.add(Dense(units=1))
+
+recorrente.compile(loss='mean_squared_error',optimizer='RMSProp')
+recorrente.summary()
+
+resultado = recorrente.fit(xtreino_novo,ytreino_novo,validation_data=(xteste_novo,yteste_novo),epochs=100)
+
+y_ajustado = recorrente.predict(xtreino_novo)
+
+sns.lineplot(x='datas',y=ytreino[:,0],data=bike[0:tamanho_treino],label='treino')
+sns.lineplot(x='datas',y=y_ajustado[:,0],data=bike[0:15662],label='ajuste_treino')
+plt.xticks(rotation=70)
+
+y_predito = recorrente.predict(xteste_novo)
+
+sns.lineplot(x='datas',y=yteste[:,0], data=bike[tamanho_treino:len(bike)],label='teste')
+sns.lineplot(x='datas',y=y_predito[:,0], data=bike[tamanho_treino+10:len(bike)],marker='.',label='previsão')
+plt.xticks(rotation=70)
