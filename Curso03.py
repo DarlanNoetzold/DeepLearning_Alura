@@ -212,3 +212,4 @@ sns.lineplot(x='tempo',y=pd.DataFrame(y_predict_novo)[0],data=passageiros[4:129]
 
 sns.lineplot(x='tempo',y=yteste_novo,data=passageiros[133:144],label='teste')
 sns.lineplot(x='tempo',y=resultado.values,data=passageiros[133:144],label='previsão')
+
