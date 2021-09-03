@@ -293,3 +293,34 @@ y_predito = recorrente.predict(xteste_novo)
 sns.lineplot(x='datas',y=yteste[:,0], data=bike[tamanho_treino:len(bike)],label='teste')
 sns.lineplot(x='datas',y=y_predito[:,0], data=bike[tamanho_treino+10:len(bike)],marker='.',label='previsão')
 plt.xticks(rotation=70)
+
+from tensorflow.keras.layers import GRU
+
+recorrente_g = Sequential()
+
+recorrente_g.add(GRU(128, input_shape=(xtreino_novo.shape[1],xtreino_novo.shape[2])
+                    ))
+recorrente_g.add(Dense(units=1))
+
+recorrente_g.compile(loss='mean_squared_error',optimizer='RMSProp')
+recorrente_g.summary()
+
+resultado2 = recorrente_g.fit(xtreino_novo,ytreino_novo,
+                              validation_data=(xteste_novo,yteste_novo),epochs=100)
+
+y_predito2 = recorrente_g.predict(xteste_novo)
+
+sns.lineplot(x='datas',y=yteste[:,0], data=bike[tamanho_treino:len(bike)])
+sns.lineplot(x='datas',y=y_predito2[:,0], data=bike[tamanho_treino+10:len(bike)],marker='.')
+plt.legend(['conhecido','estimado'])
+plt.xticks(rotation=70)
+
+print(resultado2.history.keys())
+
+plt.plot(resultado.history['loss'])
+plt.plot(resultado.history['val_loss'])
+plt.legend(['treino','teste'])
+
+plt.plot(resultado2.history['loss'])
+plt.plot(resultado2.history['val_loss'])
+plt.legend(['treino','teste'])
