@@ -1,14 +1,9 @@
 # A base de dados
 
 ### Carregando o dataset
-
-from google.colab import files
-
-files.upload()
-
 import pandas as pd
 
-dados = pd.read_csv('Bicicletas.csv')
+dados = pd.read_csv('bicicletas.csv')
 
 ### Conhecendo a base de dados
 
