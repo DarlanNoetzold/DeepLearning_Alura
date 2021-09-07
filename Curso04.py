@@ -1,9 +1,14 @@
 # A base de dados
 
 ### Carregando o dataset
+
+from google.colab import files
+
+files.upload()
+
 import pandas as pd
 
-dados = pd.read_csv('bicicletas.csv')
+dados = pd.read_csv('Bicicletas.csv')
 
 ### Conhecendo a base de dados
 
@@ -165,3 +170,75 @@ def valor_de_custo(Y_predito, Y):
 
     custo = -1 / m * (np.dot(Y, np.log(Y_predito).T) + np.dot(1 - Y, np.log(1 - Y_predito).T))
     return np.squeeze(custo)
+
+
+### Retropropagação
+
+def retropropagacao_total(Y_predito, Y, memoria, valores_parametros, arquitetura):
+    gradientes = {}
+
+    # numero de exemplos
+    # m = Y.shape[1]
+    # para garantir que os dois vetores tenham a mesma dimensão
+    Y = Y.reshape(Y_predito.shape)
+
+    # inicia o algoritmo de gradiente descendente
+    dAtivado_anterior = - (np.divide(Y, Y_predito) - np.divide(1 - Y, 1 - Y_predito));
+
+    for indice_camada_anterior, camada in reversed(list(enumerate(arquitetura))):
+        indice_camada_atual = indice_camada_anterior + 1
+        # Função de ativação para a camada atual
+
+        funcao_ativao_atual = camada["ativacao"]
+
+        dAtivado_atual = dAtivado_anterior
+
+        Ativado_anterior = memoria["A" + str(indice_camada_anterior)]
+        Saida_atual = memoria["Z" + str(indice_camada_atual)]
+
+        Pesos_atual = valores_parametros["P" + str(indice_camada_atual)]
+        b_atual = valores_parametros["b" + str(indice_camada_atual)]
+
+        dAtivado_anterior, dPesos_atual, db_atual = retropropagacao_uma_camada(
+            dAtivado_atual, Pesos_atual, b_atual, Saida_atual, Ativado_anterior, funcao_ativao_atual)
+
+        gradientes["dP" + str(indice_camada_atual)] = dPesos_atual
+        gradientes["db" + str(indice_camada_atual)] = db_atual
+
+    return gradientes
+
+
+def sigmoid_retro(dAtivado, Saida):
+    sig = sigmoid(Saida)
+    return dAtivado * sig * (1 - sig)
+
+
+def relu_retro(dAtivado, Saida):
+    dSaida = np.array(dAtivado, copy=True)
+    dSaida[Saida <= 0] = 0;
+    return dSaida;
+
+
+def retropropagacao_uma_camada(dAtivado_atual, Pesos_atual, b_atual, Saida_atual, Ativado_anterior, ativacao="relu"):
+    # número de exemplos
+    m = Ativado_anterior.shape[1]
+
+    # seleção função de ativação
+    if ativacao is "relu":
+        func_ativacao_retro = relu_retro
+    elif ativacao is "sigmoid":
+        func_ativacao_retro = sigmoid_retro
+    else:
+        raise Exception('Ainda não implementamos essa funcao')
+
+    # derivada da função de ativação
+    dSaida_atual = func_ativacao_retro(dAtivado_atual, Saida_atual)
+
+    # derivada da matriz de Pesos
+    dPesos_atual = np.dot(dSaida_atual, Ativado_anterior.T) / m
+    # derivada do vetor b
+    db_atual = np.sum(dSaida_atual, axis=1, keepdims=True) / m
+    # derivada da matriz A_anterior
+    dAtivado_anterior = np.dot(Pesos_atual.T, dSaida_atual)
+
+    return dAtivado_anterior, dPesos_atual, db_atual
