@@ -242,3 +242,80 @@ def retropropagacao_uma_camada(dAtivado_atual, Pesos_atual, b_atual, Saida_atual
     dAtivado_anterior = np.dot(Pesos_atual.T, dSaida_atual)
 
     return dAtivado_anterior, dPesos_atual, db_atual
+
+
+### Treinamento
+
+def treino(X, Y, X_teste, Y_teste, arquitetura, epocas, taxa_aprendizagem):
+    # Inicia os parâmetros da rede neural
+    valores_parametros = inicia_camadas(arquitetura, 2)
+    # Listas que vão guardar o progresso da aprendizagem da rede
+    historia_custo = []
+    historia_custo_teste = []
+
+    # Atualiza a cada época
+    for i in range(epocas):
+        # Propaga a rede - Foward propagation
+        Y_predito, memoria = propaga_total(X, valores_parametros, arquitetura)
+
+        Y_predito_teste, memoria2 = propaga_total(X_teste, valores_parametros,
+                                                  arquitetura)
+
+        # calcula as métricas e salva nas listas de história
+        custo = valor_de_custo(Y_predito, Y)
+        historia_custo.append(custo)
+        custo_teste = valor_de_custo(Y_predito_teste, Y_teste)
+        historia_custo_teste.append(custo_teste)
+
+        # Retropropagação - Backpropagation
+        gradientes = retropropagacao_total(Y_predito, Y, memoria,
+                                           valores_parametros, arquitetura)
+        # Atualiza os pesos
+        valores_parametros = atualiza(valores_parametros, gradientes,
+                                      arquitetura, taxa_aprendizagem)
+
+        if (i % 50 == 0):
+            print("Iteração: {:05} - custo: {:.5f} ".format(i, custo))
+
+    return valores_parametros, historia_custo, historia_custo_teste
+
+
+from sklearn.model_selection import train_test_split
+
+X_treino, X_teste, y_treino, y_teste = train_test_split(X, y, test_size=0.43, random_state=42)
+
+# Treinamento
+valores_parametros, historia_custo, historia_custo_teste = treino(np.transpose(X_treino), np.transpose(
+    y_treino.reshape((y_treino.shape[0], 1))),
+                                                                  np.transpose(X_teste),
+                                                                  np.transpose(y_teste.reshape((y_teste.shape[0], 1))),
+                                                                  arquitetura, 20000, 0.01)
+
+plt.plot(historia_custo)
+plt.plot(historia_custo_teste, 'r')
+plt.legend(['Treinamento', 'Teste'])
+plt.ylabel('Custo')
+plt.xlabel('Épocas')
+plt.show()
+
+### Fazendo Previsões
+
+# Previsão
+Y_pred, _ = propaga_total(np.transpose(X_teste), valores_parametros, arquitetura)
+
+plt.plot(np.transpose(X_teste)[1], ymax * y_teste, '.')
+plt.plot(np.transpose(X_teste)[1], ymax * Y_pred.reshape([-1, 1]), '.r')
+plt.legend(['Reais', 'Preditos'])
+plt.ylabel('bicicletas_alugadas')
+plt.xlabel('temperatura')
+plt.show()
+
+plt.plot(3 * np.transpose(X_teste)[0], ymax * y_teste, '.')
+plt.plot(3 * np.transpose(X_teste)[0], ymax * Y_pred.reshape([-1, 1]), '.r')
+plt.legend(['Reais', 'Preditos'])
+plt.ylabel('bicicletas_alugadas')
+plt.xlabel('clima')
+plt.rcParams.update({'font.size': 22})
+indice = [1, 2, 3]
+plt.xticks(indice, fontsize=14)
+plt.show()
