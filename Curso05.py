@@ -110,7 +110,6 @@ nuvem_palavras_pos(resenha, "text_pt")
 import nltk
 frase = ["um filme bom", "um filme ruim"]
 frequencia = nltk.FreqDist(frase)
-print(frequecia)
 
 from nltk import tokenize
 
