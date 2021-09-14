@@ -126,4 +126,39 @@ df_frequencia = pd.DataFrame({"Palavra": list(frequencia.keys()),
 
 df_frequencia.nlargest(columns = "Frequência", n = 10)
 
+#Aula 5 - Uma nova visualização e os stop words
+
+import seaborn as sns
+
+def pareto(texto, coluna_texto, quantidade):
+    todas_palavras = ' '.join([texto for texto in texto[coluna_texto]])
+    token_frase = token_espaco.tokenize(todas_palavras)
+    frequencia = nltk.FreqDist(token_frase)
+    df_frequencia = pd.DataFrame({"Palavra": list(frequencia.keys()),
+                                  "Frequência": list(frequencia.values())})
+    df_frequencia = df_frequencia.nlargest(columns="Frequência", n=quantidade)
+    plt.figure(figsize=(12, 8))
+    ax = sns.barplot(data=df_frequencia, x="Palavra", y="Frequência", color='gray')
+    ax.set(ylabel="Contagem")
+    plt.show()
+
+pareto(resenha, "text_pt", 10)
+
+palavras_irrelevantes = nltk.corpus.stopwords.words("portuguese")
+
+frase_processada = list()
+for opiniao in resenha.text_pt:
+    nova_frase = list()
+    palavras_texto = token_espaco.tokenize(opiniao)
+    for palavra in palavras_texto:
+        if palavra not in palavras_irrelevantes:
+            nova_frase.append(palavra)
+    frase_processada.append(' '.join(nova_frase))
+
+resenha["tratamento_1"] = frase_processada
+
+classificar_texto(resenha, "tratamento_1", "classificacao")
+pareto(resenha,"tratamento_1", 10)
+
+
 
