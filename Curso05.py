@@ -160,5 +160,12 @@ resenha["tratamento_1"] = frase_processada
 classificar_texto(resenha, "tratamento_1", "classificacao")
 pareto(resenha,"tratamento_1", 10)
 
+#Introdução ao Processamento de Linguagem Natural com Python (Parte 2)
 
+from nltk import tokenize
 
+frase = "Olá mundo!"
+token_pontuacao = tokenize.WordPunctTokenizer()
+token_frase = token_pontuacao.tokenize(frase)
+
+print(token_frase)
