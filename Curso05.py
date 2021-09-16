@@ -169,3 +169,30 @@ token_pontuacao = tokenize.WordPunctTokenizer()
 token_frase = token_pontuacao.tokenize(frase)
 
 print(token_frase)
+
+from string import punctuation
+
+pontuacao = list()
+for ponto in punctuation:
+    pontuacao.append(ponto)
+
+pontuacao_stopwords = pontuacao + palavras_irrelevantes
+
+frase_processada = list()
+for opiniao in resenha["tratamento_1"]:
+    nova_frase = list()
+    palavras_texto = token_pontuacao.tokenize(opiniao)
+    for palavra in palavras_texto:
+        if palavra not in pontuacao_stopwords:
+            nova_frase.append(palavra)
+    frase_processada.append(' '.join(nova_frase))
+
+resenha["tratamento_2"] = frase_processada
+
+print(resenha.head())
+
+resenha["tratamento_1"][0]
+resenha["tratamento_2"][0]
+
+pareto(resenha, "tratamento_2", 10)
+
