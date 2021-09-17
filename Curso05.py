@@ -196,3 +196,45 @@ resenha["tratamento_2"][0]
 
 pareto(resenha, "tratamento_2", 10)
 
+import unidecode
+
+acentos = "ótimo péssimo não é tão"
+
+teste = unidecode.unidecode(acentos)
+print(teste)
+sem_acentos = [unidecode.unidecode(texto) for texto in resenha["tratamento_2"]]
+stopwords_sem_acento = [unidecode.unidecode(texto) for texto in pontuacao_stopwords]
+resenha["tratamento_3"] = sem_acentos
+
+frase_processada = list()
+for opiniao in resenha["tratamento_3"]:
+    nova_frase = list()
+    palavras_texto = token_pontuacao.tokenize(opiniao)
+    for palavra in palavras_texto:
+        if palavra not in stopwords_sem_acento:
+            nova_frase.append(palavra)
+    frase_processada.append(' '.join(nova_frase))
+
+resenha["tratamento_3"] = frase_processada
+
+acuracia_tratamento3 = classificar_texto(resenha, "tratamento_3", "classificacao")
+print(acuracia_tratamento3)
+nuvem_palavras_neg(resenha, "tratamento_3")
+pareto(resenha, "tratamento_3", 10)
+
+frase_processada = list()
+for opiniao in resenha["tratamento_3"]:
+    nova_frase = list()
+    opiniao = opiniao.lower()
+    palavras_texto = token_pontuacao.tokenize(opiniao)
+    for palavra in palavras_texto:
+        if palavra not in stopwords_sem_acento:
+            nova_frase.append(palavra)
+    frase_processada.append(' '.join(nova_frase))
+
+resenha["tratamento_4"] = frase_processada
+
+acuracia_tratamento4 = classificar_texto(resenha, "tratamento_4", "classificacao")
+print(acuracia_tratamento4)
+print(acuracia_tratamento3)
+pareto(resenha, "tratamento_4", 10)
