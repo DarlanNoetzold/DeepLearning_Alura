@@ -238,3 +238,29 @@ acuracia_tratamento4 = classificar_texto(resenha, "tratamento_4", "classificacao
 print(acuracia_tratamento4)
 print(acuracia_tratamento3)
 pareto(resenha, "tratamento_4", 10)
+
+#Evitando flexões e derivações nas palavras
+
+
+stemmer = nltk.RSLPStemmer()
+stemmer.stem("correria")
+
+frase_processada = list()
+for opiniao in resenha["tratamento_4"]:
+    nova_frase = list()
+    palavras_texto = token_pontuacao.tokenize(opiniao)
+    for palavra in palavras_texto:
+        if palavra not in stopwords_sem_acento:
+            nova_frase.append(stemmer.stem(palavra))
+    frase_processada.append(' '.join(nova_frase))
+
+resenha["tratamento_5"] = frase_processada
+
+acuracia_tratamento5 = classificar_texto(resenha, "tratamento_5", "classificacao")
+print(acuracia_tratamento5)
+print(acuracia_tratamento4)
+
+nuvem_palavras_neg(resenha, "tratamento_5")
+nuvem_palavras_pos(resenha,"tratamento_5")
+pareto(resenha, "tratamento_5", 10)
+
