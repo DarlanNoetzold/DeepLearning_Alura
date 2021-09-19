@@ -264,3 +264,67 @@ nuvem_palavras_neg(resenha, "tratamento_5")
 nuvem_palavras_pos(resenha,"tratamento_5")
 pareto(resenha, "tratamento_5", 10)
 
+#TF-IDF e Ngrams: técnicas mais avançadas
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+frases = ["Assiti um filme ótimo", "Assiti um filme péssimo"]
+
+tfidf = TfidfVectorizer(lowercase=False, max_features=50)
+
+caracteristicas = tfidf.fit_transform(frases)
+pd.DataFrame(
+    caracteristicas.todense(),
+    columns=tfidf.get_feature_names()
+)
+tfidf_bruto = tfidf.fit_transform(resenha["text_pt"])
+treino, teste, classe_treino, classe_teste = train_test_split(tfidf_bruto,
+                                                              resenha["classificacao"],
+                                                              random_state = 42)
+regressao_logistica.fit(treino, classe_treino)
+acuracia_tfidf_bruto = regressao_logistica.score(teste, classe_teste)
+print(acuracia_tfidf_bruto)
+
+tfidf_tratados = tfidf.fit_transform(resenha["tratamento_5"])
+treino, teste, classe_treino, classe_teste = train_test_split(tfidf_tratados,
+                                                              resenha["classificacao"],
+                                                              random_state = 42)
+regressao_logistica.fit(treino, classe_treino)
+acuracia_tfidf_tratados = regressao_logistica.score(teste, classe_teste)
+print(acuracia_tfidf_tratados)
+
+print(acuracia_tratamento5)
+
+from nltk import ngrams
+
+frase = "Assisti um ótimo filme."
+frase_separada = token_espaco.tokenize(frase)
+pares = ngrams(frase_separada, 2)
+list(pares)
+
+tfidf = TfidfVectorizer(lowercase=False, ngram_range = (1,2))
+vetor_tfidf = tfidf.fit_transform(resenha["tratamento_5"])
+treino, teste, classe_treino, classe_teste = train_test_split(vetor_tfidf,
+                                                              resenha["classificacao"],
+                                                              random_state = 42)
+regressao_logistica.fit(treino, classe_treino)
+acuracia_tfidf_ngrams = regressao_logistica.score(teste, classe_teste)
+print(acuracia_tfidf_ngrams)
+
+tfidf = TfidfVectorizer(lowercase=False)
+vetor_tfidf = tfidf.fit_transform(resenha["tratamento_5"])
+treino, teste, classe_treino, classe_teste = train_test_split(vetor_tfidf,
+                                                              resenha["classificacao"],
+                                                              random_state = 42)
+regressao_logistica.fit(treino, classe_treino)
+acuracia_tfidf = regressao_logistica.score(teste, classe_teste)
+print(acuracia_tfidf)
+
+pesos = pd.DataFrame(
+    regressao_logistica.coef_[0].T,
+    index = tfidf.get_feature_names()
+)
+
+pesos.nlargest(50,0)
+
+pesos.nsmallest(10,0)
