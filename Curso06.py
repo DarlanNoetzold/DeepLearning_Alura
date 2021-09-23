@@ -62,3 +62,54 @@ questoes_ing_sem_code_tag = remover(questoes_ing_sem_code, regex_html)
 
 dados_ingles["sem_code_tag"] = questoes_ing_sem_code_tag
 dados_ingles.head()
+
+regex_pontuacao = re.compile(r"[^\w\s]")
+def minusculo(textos):
+    if type(textos) == str:
+        return textos.lower()
+    else:
+        return [texto.lower() for texto in textos]
+
+regex_digitos = re.compile(r"\d+")
+print(remover("Alura \n 1234 Caelum 1234", regex_digitos))
+
+regex_espaco = re.compile(r" +")
+regex_quebra_linha = re.compile(r"(\n)")
+
+
+def substituir_por_espaco(textos, regex):
+    if type(textos) == str:
+        return regex.sub(" ", textos)
+    else:
+        return [regex.sub(" ", texto) for texto in textos]
+
+
+print(substituir_por_espaco("Alura \n \n     Caleum", regex_quebra_linha))
+
+questoes_port_sem_pont = remover(dados_portugues.sem_code_tag,
+                                 regex_pontuacao)
+questoes_port_sem_pont_minus = minusculo(questoes_port_sem_pont)
+questoes_port_sem_pont_minus_dig = remover(questoes_port_sem_pont_minus,
+                                          regex_digitos)
+
+
+questoes_port_sem_quebra_linha = substituir_por_espaco(questoes_port_sem_pont_minus_dig,
+                                                       regex_quebra_linha)
+questoes_port_sem_espaco_duplicado = substituir_por_espaco(questoes_port_sem_quebra_linha,
+                                                          regex_espaco)
+
+dados_portugues["questoes_tratadas"] = questoes_port_sem_espaco_duplicado
+
+questoes_ing_sem_pont = remover(dados_ingles.sem_code_tag,
+                                 regex_pontuacao)
+questoes_ing_sem_pont_minus = minusculo(questoes_ing_sem_pont)
+questoes_ing_sem_pont_minus_dig = remover(questoes_ing_sem_pont_minus,
+                                          regex_digitos)
+
+
+questoes_ing_sem_quebra_linha = substituir_por_espaco(questoes_ing_sem_pont_minus_dig,
+                                                       regex_quebra_linha)
+questoes_ing_sem_espaco_duplicado = substituir_por_espaco(questoes_ing_sem_quebra_linha,
+                                                          regex_espaco)
+
+dados_ingles["questoes_tratadas"] = questoes_ing_sem_espaco_duplicado
