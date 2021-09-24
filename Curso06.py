@@ -113,3 +113,11 @@ questoes_ing_sem_espaco_duplicado = substituir_por_espaco(questoes_ing_sem_quebr
                                                           regex_espaco)
 
 dados_ingles["questoes_tratadas"] = questoes_ing_sem_espaco_duplicado
+
+from nltk.util import bigrams
+texto_teste = "alura"
+print(list(bigrams(texto_teste)))
+
+from nltk.lm.preprocessing import pad_both_ends
+
+print(list(bigrams(pad_both_ends(texto_teste, n = 2))))
