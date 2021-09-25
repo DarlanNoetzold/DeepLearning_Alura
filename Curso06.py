@@ -121,3 +121,50 @@ print(list(bigrams(texto_teste)))
 from nltk.lm.preprocessing import pad_both_ends
 
 print(list(bigrams(pad_both_ends(texto_teste, n = 2))))
+
+from sklearn.model_selection import train_test_split
+
+port_treino, port_teste = train_test_split(dados_portugues.questoes_tratadas,
+                                          test_size = 0.2,
+                                          random_state = 123)
+
+ing_treino, ing_teste = train_test_split(dados_ingles.questoes_tratadas,
+                                          test_size = 0.2,
+                                          random_state = 123)
+todas_questoes_port = ' '.join(port_treino)
+from nltk.tokenize import WhitespaceTokenizer
+
+todas_palavras_port = WhitespaceTokenizer().tokenize(todas_questoes_port)
+print(todas_palavras_port)
+
+from nltk.lm.preprocessing import padded_everygram_pipeline
+
+
+port_treino_bigram, vocab_port = padded_everygram_pipeline(2,
+                                                           todas_palavras_port)
+
+from nltk.lm.preprocessing import padded_everygram_pipeline
+
+
+port_treino_bigram, vocab_port = padded_everygram_pipeline(2,
+                                                           todas_palavras_port)
+
+from nltk.lm import MLE
+
+modelo_port = MLE(2)
+modelo_port.fit(port_treino_bigram, vocab_port)
+
+modelo_port.generate(num_words=6)
+from nltk.lm import NgramCounter
+
+modelo_port.counts[['m']].items()
+
+texto = "good morning"
+palavras = WhitespaceTokenizer().tokenize(texto)
+palavras_fakechar = [list(pad_both_ends(palavra, n = 2)) for palavra in palavras]
+palavras_bigramns = [list(bigrams(palavra)) for palavra in palavras_fakechar]
+print(palavras_bigramns)
+
+print(palavras_bigramns[0])
+print(modelo_port.perplexity(palavras_bigramns[0]))
+print(modelo_port.perplexity(palavras_bigramns[1]))
