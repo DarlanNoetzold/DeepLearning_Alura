@@ -168,3 +168,39 @@ print(palavras_bigramns)
 print(palavras_bigramns[0])
 print(modelo_port.perplexity(palavras_bigramns[0]))
 print(modelo_port.perplexity(palavras_bigramns[1]))
+
+
+def treinar_modelo_mle(lista_textos):
+    todas_questoes = ' '.join(lista_textos)
+    todas_palavras = WhitespaceTokenizer().tokenize(todas_questoes)
+    bigrams, vocabulario = padded_everygram_pipeline(2, todas_palavras)
+    modelo = MLE(2)
+    modelo.fit(bigrams, vocabulario)
+
+    return modelo
+
+modelo_port_2 = treinar_modelo_mle(port_treino)
+print(modelo_port_2.perplexity(palavras_bigramns[0]))
+print(modelo_port_2.perplexity(palavras_bigramns[1]))
+modelo_ing = treinar_modelo_mle(ing_treino)
+
+print(modelo_ing.perplexity(palavras_bigramns[0]))
+print(modelo_ing.perplexity(palavras_bigramns[1]))
+
+
+def calcular_perplexidade(modelo, texto):
+    perplexidade = 0
+    palavras = WhitespaceTokenizer().tokenize(texto)
+    palavras_fakechar = [list(pad_both_ends(palavra, n=2)) for palavra in palavras]
+    palavras_bigramns = [list(bigrams(palavra)) for palavra in palavras_fakechar]
+
+    for palavra in palavras_bigramns:
+        perplexidade += modelo.perplexity(palavra)
+
+    return perplexidade
+
+print(calcular_perplexidade(modelo_ing, "good morning"))
+print(calcular_perplexidade(modelo_port, port_teste.iloc[0]))
+
+port_teste.iloc[0]
+print(calcular_perplexidade(modelo_ing, port_teste.iloc[0]))
