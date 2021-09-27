@@ -204,3 +204,45 @@ print(calcular_perplexidade(modelo_port, port_teste.iloc[0]))
 
 port_teste.iloc[0]
 print(calcular_perplexidade(modelo_ing, port_teste.iloc[0]))
+
+from nltk.lm import Laplace
+
+
+def treinar_modelo_Laplace(lista_textos):
+    todas_questoes = ' '.join(lista_textos)
+    todas_palavras = WhitespaceTokenizer().tokenize(todas_questoes)
+    bigrams, vocabulario = padded_everygram_pipeline(2, todas_palavras)
+    modelo = Laplace(2)
+    modelo.fit(bigrams, vocabulario)
+
+    return modelo
+
+modelo_ing_Laplace = treinar_modelo_Laplace(ing_treino)
+print(calcular_perplexidade(modelo_ing_Laplace, port_teste.iloc[0]))
+
+modelo_port_Laplace = treinar_modelo_Laplace(port_treino)
+print(calcular_perplexidade(modelo_port_Laplace, port_teste.iloc[0]))
+
+def atribui_idioma(lista_textos):
+    idioma = []
+    for texto in lista_textos:
+        portugues = calcular_perplexidade(modelo_port_Laplace, texto)
+        ingles = calcular_perplexidade(modelo_ing_Laplace, texto)
+        espanhol = calcular_perplexidade(modelo_esp_Laplace, texto)
+        if ingles >= portugues <= espanhol:
+            idioma.append("portugues")
+        elif portugues > ingles < espanhol:
+            idioma.append("ingles")
+        else:
+            idioma.append("espanhol")
+    return idioma
+
+resultados_portugues = atribui_idioma(port_teste)
+taxa_portugues = resultados_portugues.count("portugues")/len(resultados_portugues)
+len(port_teste)
+
+resultados_ingles = atribui_idioma(ing_teste)
+taxa_ingles = resultados_ingles.count("ingles")/len(resultados_ingles)
+
+print("Port", taxa_portugues)
+print("Ing", taxa_ingles)
