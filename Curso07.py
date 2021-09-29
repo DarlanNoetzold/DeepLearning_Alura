@@ -28,3 +28,6 @@ print(vetor_bom.toarray())
 vetor_otimo = vetorizador.transform(["ótimo"])
 print(vetor_otimo.toarray())
 
+with open("cbow_s300.txt") as f:
+    for linha in range(30):
+        print(next(f))
