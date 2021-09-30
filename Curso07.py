@@ -31,3 +31,16 @@ print(vetor_otimo.toarray())
 with open("cbow_s300.txt") as f:
     for linha in range(30):
         print(next(f))
+
+from gensim.models import KeyedVectors
+
+modelo = KeyedVectors.load_word2vec_format("cbow_s300.txt")
+modelo.most_similar("china")
+modelo.most_similar("itália")
+modelo.most_similar(positive=["brasil", "argentina"])
+
+#nuvens -> nuvem : estrelas -> estrela
+#nuvens + estrela - nuvem = estrelas
+
+modelo.most_similar(positive=["nuvens", "estrela"], negative=["nuvem"])
+modelo.most_similar(positive=["professor", "mulher"], negative=["homem"])
