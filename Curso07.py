@@ -44,3 +44,40 @@ modelo.most_similar(positive=["brasil", "argentina"])
 
 modelo.most_similar(positive=["nuvens", "estrela"], negative=["nuvem"])
 modelo.most_similar(positive=["professor", "mulher"], negative=["homem"])
+
+artigo_treino.title.loc[12]
+import string
+import nltk
+nltk.download('punkt')
+
+def tokenizador(texto):
+    texto = texto.lower()
+    lista_alfanumerico = []
+
+    for token_valido in nltk.word_tokenize(texto):
+        if token_valido in string.punctuation: continue
+        lista_alfanumerico.append(token_valido)
+
+    return lista_alfanumerico
+
+tokenizador("Texto Exemplo, 1234.")
+
+import numpy as np
+def combinacao_de_vetores_por_soma(palavras_numeros):
+    vetor_resultante = np.zeros(300)
+    for pn in palavras_numeros:
+        try:
+            vetor_resultante += modelo.get_vector(pn)
+        except KeyError:
+            if pn.isnumeric():
+               pn = "0"*len(pn)
+               vetor_resultante += modelo.get_vector(pn)
+            else:
+                vetor_resultante += modelo.get_vector("unknown")
+
+    return vetor_resultante
+
+palavras_numeros = tokenizador("texto exemplo caelumx")
+vetor_texto = combinacao_de_vetores_por_soma(palavras_numeros)
+print(len(vetor_texto))
+print(vetor_texto)
