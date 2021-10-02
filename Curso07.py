@@ -81,3 +81,41 @@ palavras_numeros = tokenizador("texto exemplo caelumx")
 vetor_texto = combinacao_de_vetores_por_soma(palavras_numeros)
 print(len(vetor_texto))
 print(vetor_texto)
+
+def matriz_vetores(textos):
+    x = len(textos)
+    y = 300
+    matriz = np.zeros((x,y))
+
+    for i in range(x):
+        palavras_numeros = tokenizador(textos.iloc[i])
+        matriz[i] = combinacao_de_vetores_por_soma(palavras_numeros)
+
+    return matriz
+
+matriz_vetores_treino = matriz_vetores(artigo_treino.title)
+matriz_vetores_teste = matriz_vetores(artigo_teste.title)
+print(matriz_vetores_treino.shape)
+print(matriz_vetores_teste.shape)
+
+from sklearn.linear_model import LogisticRegression
+
+LR = LogisticRegression(max_iter = 200)
+LR.fit(matriz_vetores_treino, artigo_treino.category)
+
+LR.score(matriz_vetores_teste, artigo_teste.category)
+artigo_teste.category.unique()
+from sklearn.metrics import classification_report
+
+label_prevista = LR.predict(matriz_vetores_teste)
+CR = classification_report(artigo_teste.category, label_prevista)
+print(CR)
+
+from sklearn.dummy import DummyClassifier
+
+DC = DummyClassifier()
+DC.fit(matriz_vetores_treino, artigo_treino.category)
+label_prevista_dc = DC.predict(matriz_vetores_teste)
+
+CR_dummy = classification_report(artigo_teste.category, label_prevista_dc)
+print(CR_dummy)
