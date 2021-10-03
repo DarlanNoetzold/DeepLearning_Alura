@@ -119,3 +119,46 @@ label_prevista_dc = DC.predict(matriz_vetores_teste)
 
 CR_dummy = classification_report(artigo_teste.category, label_prevista_dc)
 print(CR_dummy)
+
+#Skip_gram
+
+modelo_skipgram = KeyedVectors.load_word2vec_format("skip_s300.txt")
+
+def combinacao_de_vetores_por_soma_skipgram(palavras_numeros):
+    vetor_resultante = np.zeros(300)
+    for pn in palavras_numeros:
+        try:
+            vetor_resultante += modelo_skipgram.get_vector(pn)
+
+        except KeyError:
+            if pn.isnumeric():
+                pn = "0" * len(pn)
+                vetor_resultante += modelo_skipgram.get_vector(pn)
+
+            else:
+                vetor_resultante += modelo_skipgram.get_vector("unknown")
+
+    return vetor_resultante
+
+
+def matriz_vetores_skipgram(textos):
+    x = len(textos)
+    y = 300
+    matriz = np.zeros((x, y))
+
+    for i in range(x):
+        palavras_numeros = tokenizador(textos.iloc[i])
+        matriz[i] = combinacao_de_vetores_por_soma_skipgram(palavras_numeros)
+
+    return matriz
+
+
+matriz_vetores_treino_skipgram = matriz_vetores_skipgram(artigo_treino.title)
+matriz_vetores_teste_skipgram = matriz_vetores_skipgram(artigo_teste.title)
+
+# Previsão
+LR_skipgram = LogisticRegression(max_iter=1000)
+LR_skipgram.fit(matriz_vetores_treino_skipgram, artigo_treino.category)
+label_previsao_skipgram = LR_skipgram.predict(matriz_vetores_teste_skipgram)
+CR_skipgram = classification_report(artigo_teste.category, label_previsao_skipgram)
+print(CR_skipgram)
