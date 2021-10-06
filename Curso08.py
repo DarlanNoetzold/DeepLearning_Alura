@@ -26,11 +26,6 @@ texto = "Rio de Janeiro 1231231 ***** @#$ é uma cidade maravilhosa!"
 doc = nlp(texto)
 trata_textos(doc)
 
-texto = "Rio de Janeiro 1231231 ***** @#$ é uma cidade maravilhosa!"
-doc = nlp(texto)
-trata_textos(doc)
-
-
 from time import time
 
 t0 = time()
@@ -43,3 +38,32 @@ print(tf/60)
 
 titulos_tratados = pd.DataFrame({"titulo": textos_tratados})
 titulos_tratados.head()
+
+
+from gensim.models import Word2Vec
+
+w2v_modelo = Word2Vec(sg = 0,
+                      window = 2,
+                      size = 300,
+                      min_count = 5,
+                      alpha = 0.03,
+                      min_alpha = 0.007)
+
+print(len(titulos_tratados))
+titulos_tratados = titulos_tratados.dropna().drop_duplicates()
+print(len(titulos_tratados))
+
+lista_lista_tokens = [titulo.split(" ") for titulo in titulos_tratados.titulo]
+
+
+import logging
+
+logging.basicConfig(format="%(asctime)s : - %(message)s", level = logging.INFO)
+
+w2v_modelo = Word2Vec(sg = 0,
+                      window = 2,
+                      size = 300,
+                      min_count = 5,
+                      alpha = 0.03,
+                      min_alpha = 0.007)
+w2v_modelo.build_vocab(lista_lista_tokens, progress_per=5000)
