@@ -57,9 +57,7 @@ lista_lista_tokens = [titulo.split(" ") for titulo in titulos_tratados.titulo]
 
 
 import logging
-
 logging.basicConfig(format="%(asctime)s : - %(message)s", level = logging.INFO)
-
 w2v_modelo = Word2Vec(sg = 0,
                       window = 2,
                       size = 300,
@@ -67,3 +65,25 @@ w2v_modelo = Word2Vec(sg = 0,
                       alpha = 0.03,
                       min_alpha = 0.007)
 w2v_modelo.build_vocab(lista_lista_tokens, progress_per=5000)
+
+w2v_modelo.train(lista_lista_tokens,
+                 total_examples=w2v_modelo.corpus_count,
+                 epochs = 30)
+w2v_modelo.wv.most_similar("google")
+
+
+#Treinamento do modelo Skip-Gram
+w2v_modelo_sg = Word2Vec(sg = 1,
+                      window = 5,
+                      size = 300,
+                      min_count = 5,
+                      alpha = 0.03,
+                      min_alpha = 0.007)
+
+w2v_modelo_sg.build_vocab(lista_lista_tokens, progress_per=5000)
+
+w2v_modelo_sg.train(lista_lista_tokens,
+                 total_examples=w2v_modelo_sg.corpus_count,
+                 epochs = 30)
+
+w2v_modelo_sg.wv.most_similar("google")
