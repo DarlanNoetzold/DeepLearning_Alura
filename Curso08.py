@@ -87,3 +87,4 @@ w2v_modelo_sg.train(lista_lista_tokens,
                  epochs = 30)
 
 w2v_modelo_sg.wv.most_similar("google")
+
