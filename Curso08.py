@@ -151,3 +151,40 @@ matriz_vetores_treino_cbow = matriz_vetores(artigo_treino.title, w2v_modelo_cbow
 matriz_vetores_teste_cbow = matriz_vetores(artigo_teste.title, w2v_modelo_cbow)
 print(matriz_vetores_treino_cbow.shape)
 print(matriz_vetores_teste_cbow.shape)
+
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report
+
+
+def classificador(modelo, x_treino, y_treino, x_teste, y_teste):
+    RL = LogisticRegression(max_iter=800)
+    RL.fit(x_treino, y_treino)
+    categorias = RL.predict(x_teste)
+    resultados = classification_report(y_teste, categorias)
+    print(resultados)
+
+    return RL
+
+
+RL_cbow = classificador(w2v_modelo_cbow,
+                        matriz_vetores_treino_cbow,
+                        artigo_treino.category,
+                        matriz_vetores_teste_cbow,
+                        artigo_teste.category)
+
+matriz_vetores_treino_sg = matriz_vetores(artigo_treino.title, w2v_modelo_sg)
+matriz_vetores_teste_sg = matriz_vetores(artigo_teste.title, w2v_modelo_sg)
+
+RL_sg = classificador(w2v_modelo_sg,
+                        matriz_vetores_treino_sg,
+                        artigo_treino.category,
+                        matriz_vetores_teste_sg,
+                        artigo_teste.category)
+
+import pickle
+
+with open("/content/drive/My Drive/curso_word2vec/rl_cbow.pkl", "wb") as f:
+    pickle.dump(RL_cbow, f)
+
+with open("/content/drive/My Drive/curso_word2vec/rl_sg.pkl", "wb") as f:
+    pickle.dump(RL_sg, f)
