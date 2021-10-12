@@ -54,3 +54,5 @@ for famoso in famosos:
 
     print('-----')
     print('\n')
+
+#Azure api
