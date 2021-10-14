@@ -124,3 +124,23 @@ class MinhaStreamListener(tw.StreamListener):
 minhaStream = None
 minhaStream = tw.Stream(auth = auth, listener=MinhaStreamListener())
 minhaStream.filter(follow=['917548352446791685'])
+
+lista_arquivo = []
+
+with open("tweets.txt", 'r') as arquivo:
+  for linha in arquivo:
+    lista_arquivo.append(json.loads(linha))
+
+
+import pandas as pd
+imagens = pd.DataFrame(lista_arquivo)
+imagens.head()
+pesquisa = 'concert'
+
+achados = [(pesquisa in lista) for lista in imagens.tags]
+
+imagens[achados].descricao.iloc[0]
+
+
+imagens[achados].tags.iloc[0]
+imagens[achados].url.iloc[0]
