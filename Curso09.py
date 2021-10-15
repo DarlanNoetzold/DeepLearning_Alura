@@ -141,6 +141,5 @@ achados = [(pesquisa in lista) for lista in imagens.tags]
 
 imagens[achados].descricao.iloc[0]
 
-
 imagens[achados].tags.iloc[0]
 imagens[achados].url.iloc[0]
