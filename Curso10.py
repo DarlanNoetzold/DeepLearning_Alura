@@ -31,6 +31,7 @@ from os import listdir, path, makedirs
 from os.path import isfile, join
 
 import shutil
+import numpy as np
 
 imagem_face_1 = cv2.imread("imagens/cropped_faces/s01_01.jpg")
 imagem_face_1 = cv2.cvtColor(imagem_face_1, cv2.COLOR_BGR2RGB)
@@ -104,3 +105,81 @@ plt.title(sujeito[0])
 
 plt.imshow(dados_teste[0], cmap="gray")
 plt.title(sujeitos_teste[0])
+
+
+sujeitos = np.asarray(sujeitos, dtype=np.int32)
+sujeitos_teste = np.asarray(sujeitos_teste, dtype=np.int32)
+
+modelo_eingenfaces = cv2.face.EigenFaceRecognizer_create()
+modelo_eingenfaces.train(dados_treinamento, sujeitos)
+
+plt.figure(figsize=(20,10))
+
+plt.subplot(121)
+plt.title("Sujeito " + str(sujeitos_teste[6]))
+plt.imshow(dados_teste[6], cmap="gray")
+
+plt.subplot(122)
+plt.title("Sujeito " + str(sujeitos_teste[7]))
+plt.imshow(dados_teste[7], cmap="gray")
+
+plt.show()
+predicao = modelo_eingenfaces.predict(dados_teste[6])
+
+predicao = modelo_eingenfaces.predict(dados_teste[7])
+
+modelo_fisherfaces = cv2.face.FisherFaceRecognizer_create()
+
+modelo_fisherfaces.train(dados_treinamento, sujeitos)
+
+plt.figure(figsize=(20,10))
+
+plt.subplot(121)
+plt.title("Sujeito " + str(sujeitos_teste[13]))
+plt.imshow(dados_teste[13], cmap="gray")
+
+plt.subplot(122)
+plt.title("Sujeito " + str(sujeitos_teste[19]))
+plt.imshow(dados_teste[19], cmap="gray")
+
+plt.show()
+
+predicao = modelo_fisherfaces.predict(dados_teste[13])
+predicao = modelo_fisherfaces.predict(dados_teste[19])
+
+modelo_lbph = cv2.face.LBPHFaceRecognizer_create()
+modelo_lbph.train(dados_treinamento, sujeitos)
+
+plt.figure(figsize=(20,10))
+
+plt.subplot(121)
+plt.title("Sujeito " + str(sujeitos_teste[21]))
+plt.imshow(dados_teste[21], cmap="gray")
+
+plt.subplot(122)
+plt.title("Sujeito " + str(sujeitos_teste[27]))
+plt.imshow(dados_teste[27], cmap="gray")
+
+plt.show()
+
+predicao = modelo_lbph.predict(dados_teste[21])
+predicao = modelo_lbph.predict(dados_teste[27])
+
+
+y_pred_eingenfaces = []
+for item in dados_teste:
+    y_pred_eingenfaces.append(modelo_eingenfaces.predict(item)[0])
+acuracia_eingenfaces = accuracy_score(sujeitos_teste, y_pred_eingenfaces)
+
+
+y_pred_fisherfaces = []
+for item in dados_teste:
+    y_pred_fisherfaces.append(modelo_fisherfaces.predict(item)[0])
+acuracia_fisherfaces = accuracy_score(sujeitos_teste, y_pred_fisherfaces)
+
+
+y_pred_lbph = []
+for item in dados_teste:
+    y_pred_lbph.append(modelo_lbph.predict(item)[0])
+acuracia_lbph = accuracy_score(sujeitos_teste, y_pred_lbph)
+
