@@ -318,3 +318,106 @@ plt.imshow(imagem_anotada)
 
 valor_olho_esquerdo = aspecto_razao_olhos(marcos_faciais[0][OLHO_ESQUERDO])
 valor_olho_direito = aspecto_razao_olhos(marcos_faciais[0][OLHO_DIREITO])
+
+
+def padronizar_imagem(frame):
+    frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+    frame = cv2.resize(frame, (500, 400))
+    return frame
+
+def exibir_video(frame):
+    img = Img.fromarray(frame, "RGB")
+    buffer = BytesIO()
+    img.save(buffer, format="JPEG")
+    display(Image(data=buffer.getvalue()))
+    clear_output(wait=True)
+
+video = cv2.VideoCapture("videos/expressoes.mov")
+
+try:
+    while(True):
+        captura_ok, frame = video.read()
+        if captura_ok:
+            frame = padronizar_imagem(frame)
+            exibir_video(frame)
+except KeyboardInterrupt:
+    video.release()
+    print("Interrompido")
+
+
+def aspecto_razao_boca(pontos_boca):
+    a = dist.euclidean(pontos_boca[3], pontos_boca[9])
+    b = dist.euclidean(pontos_boca[2], pontos_boca[10])
+    c = dist.euclidean(pontos_boca[4], pontos_boca[8])
+    d = dist.euclidean(pontos_boca[0], pontos_boca[6])
+
+    aspecto_razao = (a + b + c) / (3.0 * d)
+
+    return aspecto_razao
+
+
+try:
+    ar_max = 0
+    video = cv2.VideoCapture("videos/bocejo.mov")
+    while (True):
+        captura_ok, frame = video.read()
+        if captura_ok:
+            frame = padronizar_imagem(frame)
+            marcos_faciais = pontos_marcos_faciais(frame)
+
+            if marcos_faciais is not None:
+                ar_boca = aspecto_razao_boca(marcos_faciais[0][LABIO])
+                ar_boca = round(ar_boca, 3)
+
+                if ar_boca > ar_max:
+                    ar_max = ar_boca
+
+                info = "boca " + str(ar_boca) + " maximo " + str(ar_max)
+
+                frame = anotar_marcos_casca_convexa_boca(frame, marcos_faciais)
+                cv2.putText(frame, info, (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 2)
+
+            exibir_video(frame)
+
+except KeyboardInterrupt:
+    video.release()
+    print("Interrompido")
+
+try:
+    min_olho_esq = 1
+    min_olho_dir = 1
+
+    video = cv2.VideoCapture("videos/olhos-fechados.mov")
+
+    while (True):
+        captura_ok, frame = video.read()
+        frame = padronizar_imagem(frame)
+
+        marcos_faciais = pontos_marcos_faciais(frame)
+
+        if marcos_faciais is not None:
+            ar_olho_esq = aspecto_razao_olhos(marcos_faciais[0][OLHO_ESQUERDO])
+            ar_olho_dir = aspecto_razao_olhos(marcos_faciais[0][OLHO_DIREITO])
+
+            ar_olho_esq = round(ar_olho_esq, 3)
+            ar_olho_dir = round(ar_olho_dir, 3)
+
+            if ar_olho_esq < min_olho_esq:
+                min_olho_esq = ar_olho_esq
+
+            if ar_olho_dir < min_olho_dir:
+                min_olho_dir = ar_olho_dir
+
+            info_oe = "olho esquerdo " + str(ar_olho_esq) + " minimo " + str(min_olho_esq)
+            info_od = "olho direito " + str(ar_olho_dir) + " minimo " + str(min_olho_dir)
+
+            frame = anotar_marcos_casca_convexa(frame, marcos_faciais)
+
+            cv2.putText(frame, info_oe, (20, 50), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 2)
+            cv2.putText(frame, info_od, (20, 80), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 0), 2)
+
+        exibir_video(frame)
+
+except KeyboardInterrupt:
+    video.release()
+    print("Interrompido")
